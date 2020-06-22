@@ -1,0 +1,28 @@
+<Project>
+  <Import Project="../../../../.nblcommon.csproj" Condition="Exists('../../../../.nblcommon.csproj')" />
+
+  <ItemGroup Condition="'$(DirectNblRef)'!='True'">
+    <PackageReference Include="NblWebCommon" Version="3.33.0" />
+    <PackageReference Include="NblWebCommon.MySql" Version="3.1.0" />
+    <PackageReference Include="NblWebCommon.SendGrid" Version="3.2.0" />
+    <PackageReference Include="NblWebCommon.Twilio" Version="3.2.0" />
+    <PackageReference Include="NblWebCommon.Aws" Version="0.1.0" />
+    <PackageReference Include="NblWebCommon.DocumentStorage" Version="0.5.0" />
+    <PackageReference Include="NblWebCommon.DocumentStorage.S3" Version="0.5.1" />
+    <PackageReference Include="NblWebCommon.Encryption" Version="0.2.0" />
+    <PackageReference Include="NblWebCommon.Auth.Apple" Version="0.2.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DirectNblRef)'=='True'">
+    <ProjectReference Include="../../../NblWebApp/NblWebCommon/NblWebCommon/NblWebCommon.csproj" />
+    <ProjectReference Include="../../../NblWebApp/NblWebCommon/NblWebCommon.MySql/NblWebCommon.MySql.csproj" />
+    <ProjectReference Include="../../../NblWebApp/NblWebCommon/NblWebCommon.Twilio/NblWebCommon.Twilio.csproj" />
+    <ProjectReference Include="../../../NblWebApp/NblWebCommon/NblWebCommon.SendGrid/NblWebCommon.SendGrid.csproj" />
+    <ProjectReference Include="../../../NblWebApp/NblWebCommon/NblWebCommon.Aws/NblWebCommon.Aws.csproj" />
+    <ProjectReference Include="../../../NblWebApp/NblWebCommon/NblWebCommon.DocumentStorage/NblWebCommon.DocumentStorage.csproj" />
+    <ProjectReference Include="../../../NblWebApp/NblWebCommon/NblWebCommon.DocumentStorage.S3/NblWebCommon.DocumentStorage.S3.csproj" />
+    <ProjectReference Include="../../../NblWebApp/NblWebCommon/NblWebCommon.Encryption/NblWebCommon.Encryption.csproj" />
+    <ProjectReference Include="../../../NblWebApp/NblWebCommon/NblWebCommon.Auth.Apple/NblWebCommon.Auth.Apple.csproj" />
+  </ItemGroup>
+
+</Project>

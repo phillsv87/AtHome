@@ -1,0 +1,14 @@
+﻿{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "OpenCanvas.Web": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "NBL_PRINT_CONFIG_FILE": "True",
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://0.0.0.0:5133"
+    }
+  }
+}
