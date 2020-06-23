@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -8,9 +9,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using HomeSecureApi.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NblWebCommon;
+using Newtonsoft.Json;
 
 namespace HomeSecureApi.Services
 {
@@ -18,21 +21,13 @@ namespace HomeSecureApi.Services
     public class StreamingManager: IDisposable
     {
 
-        private class PrivatePortInfo
-        {
-            public PortInfo Info{get;}
+        public const string StreamName="stream.m3u8";
 
-            public bool Connected{get;set;}
-
-            public PrivatePortInfo(PortInfo info)
-            {
-                Info=info;
-            }
-        }
-
-        private readonly List<PrivatePortInfo> _OpenPorts=new List<PrivatePortInfo>();
+        private readonly List<StreamSession> _Sessions=new List<StreamSession>();
 
         private readonly HsConfig _Config;
+
+        private List<StreamConfig> _StreamConfigs;
 
         private readonly ILogger<StreamingManager> _Logger;
 
@@ -40,12 +35,13 @@ namespace HomeSecureApi.Services
 
         private readonly CancellationTokenSource _Cancel;
 
+        private bool _FirstStream=true;
+
         public StreamingManager(HsConfig config, ILogger<StreamingManager> logger)
         {
             _Config=config;
             _Logger=logger;
             _Cancel=new CancellationTokenSource();
-            RunListenerAsync(_Cancel.Token).LogErrors();
         }
 
         public void Dispose()
@@ -54,149 +50,225 @@ namespace HomeSecureApi.Services
             _Cancel.SafeDispose();
         }
 
+        private async Task<List<StreamConfig>> GetStreamConfigsAsync(CancellationToken cancel)
+        {
+            if(_StreamConfigs!=null){
+                return _StreamConfigs;
+            }
 
-        public PortInfo OpenPort(string clientToken)
+            var path=_Config.StreamsConfig;
+            if(!File.Exists(path)){
+                throw new InvalidConfigException("StreamsConfig file does not exists - "+path);
+            }
+
+            var json=await File.ReadAllTextAsync(path,cancel);
+            _StreamConfigs=JsonConvert.DeserializeObject<List<StreamConfig>>(json);
+            return _StreamConfigs;
+        }
+
+        /// <summary>
+        /// Extends a StreamSession
+        /// </summary>
+        public DateTime ExtendSession(int streamId, Guid sessionId, string sessionToken, string clientToken)
         {
 
             if(clientToken!=_Config.ClientToken){
                 throw new UnauthorizedException();
             }
 
-            PortInfo info=new PortInfo()
+            StreamSession session;
+            lock(_Sync){
+                session=_Sessions.FirstOrDefault(s=>s.Id==sessionId);
+            }
+
+            if(session==null){
+                throw new NotFoundException("No session found by Id");
+            }
+
+            if(session.Token!=sessionToken){
+                throw new UnauthorizedException();
+            }
+
+            session.Expirers=DateTime.UtcNow.AddSeconds(_Config.ClientSessionTTLSeconds);
+
+            return session.Expirers;
+        }
+
+
+        /// <summary>
+        /// Starts a new stream session. Call ExtendSession to extend the session.
+        /// </summary>
+        public async Task<StreamSession> OpenStreamAsync(
+            int streamId,
+            string clientToken,
+            CancellationToken cancel)
+        {
+
+            if(clientToken!=_Config.ClientToken){
+                throw new UnauthorizedException();
+            }
+
+            var streamConfig=(await GetStreamConfigsAsync(cancel)).FirstOrDefault(s=>s.Id==streamId);
+
+            if(streamConfig==null){
+                throw new NotFoundException("No stream found by Id");
+            }
+
+            var token=Rando.GetReallyRandomString(30);
+            var dirToken=Rando.GetReallyRandomString(30);
+            var session=new StreamSession()
             {
-                Port=_Config.StreamingPort,
-                Token=Rando.GetReallyRandomString(30)
+                Id=Guid.NewGuid(),
+                StreamId=streamConfig.Id,
+                StreamName=streamConfig.Name,
+                Token=token,
+                Expirers=DateTime.UtcNow.AddSeconds(_Config.ClientSessionTTLSeconds),
+                TTLSeconds=_Config.ClientSessionTTLSeconds,
+                Uri=$"Stream/{dirToken}/{StreamName}"
             };
 
             lock(_Sync){
-                _OpenPorts.Add(new PrivatePortInfo(info));
+                _Sessions.Add(session);
             }
 
-            return info;
-        }
-
-        private const int BufSize=2_000_000;
-
-        private async Task RunListenerAsync(CancellationToken cancel)
-        {
-            var listener=new TcpListener(new IPEndPoint(0,_Config.StreamingPort));
-            listener.Start();
+            var ready=new TaskCompletionSource<bool>();
+            RunStreamAsync(session,streamConfig,dirToken,ready,cancel,_Cancel.Token).LogErrors();
 
             using(cancel.Register(()=>{
-                try{
-                    listener.Stop();
-                }catch{}
+                ready.TrySetCanceled();
             }))
             {
-                await Task.Delay(10).ConfigureAwait(false);
-
-                while(!cancel.IsCancellationRequested){
-
-                    var client=await listener.AcceptTcpClientAsync();
-                    RunClientAsync(client,cancel).LogErrors();
-
-                }
+                await ready.Task;
             }
+
+            return session;
         }
 
-        private readonly Regex HeaderReg=new Regex(
-            @"/\Wtoken=(\w+)",
-            RegexOptions.IgnoreCase|RegexOptions.Compiled);
-
-        private async Task RunClientAsync(TcpClient client, CancellationToken cancel)
+        /// <summary>
+        /// 
+        /// </summary>
+        private async Task RunStreamAsync(
+            StreamSession session,
+            StreamConfig streamConfig,
+            string dirToken,
+            TaskCompletionSource<bool> ready,
+            CancellationToken clientCancel,
+            CancellationToken cancel)
         {
 
-            client.NoDelay=true;
-            client.SendBufferSize=BufSize+100;
-            var stream=client.GetStream();
+            Process proc=null;
+            var root=_Config.HlsRoot;
+            if(string.IsNullOrWhiteSpace(root)){
+                throw new InvalidConfigException("HlsRoot not set");
+            }
 
+            var cmd=_Config.HlsCommand;
+            if(string.IsNullOrWhiteSpace(cmd)){
+                throw new InvalidConfigException("HlsCommand not set");
+            }
+
+            var streamDir=Path.Combine(root,dirToken);
+            if(Directory.Exists(streamDir)){
+                throw new InvalidOperationException("streamDir already exists");
+            }
+            
             try{
 
-                var buf=new byte[BufSize];
-                int l=0;
+                lock(_Sync){
+                    if(_FirstStream){
+                        _FirstStream=false;
 
-                // var t=await stream.ReadAsync(buf,0,buf.Length,cancel);
-                // Console.WriteLine(Encoding.UTF8.GetString(buf,0,t));
-                // return;
+                        var files=Directory.GetFiles(root);
+                        var dirs=Directory.GetDirectories(root);
+                        foreach(var file in files){
+                            try{
+                                File.Delete(file);
+                            }catch(Exception ex){
+                                _Logger.LogWarning(ex,"Unable to delete old hls file "+file);
+                            }
+                        }
+                        foreach(var dir in dirs){
+                            try{
+                                Directory.Delete(dir,true);
+                            }catch(Exception ex){
+                                _Logger.LogWarning(ex,"Unable to delete old hls directory "+dir);
+                            }
+                        }
 
-                while(l<300){
-                    var x=await stream.ReadAsync(buf,l,1,cancel);
-                    if(x==0){//end of stream
-                        throw new EndOfStreamException();
+                        _Logger.LogInformation("HLS cleanup complete");
                     }
-                    l++;
+                }
+                
+                Directory.CreateDirectory(streamDir);
 
-                    if(buf[l-1]=='\n' || buf[l-1]=='\r'){ // end of header
+                
+                cmd=cmd
+                    .Replace("{INPUT}",streamConfig.Uri)
+                    .Replace("{STREAM_NAME}",StreamName);
+                var args=cmd.Split(' ',2);
+
+                proc=new Process(){
+                    StartInfo=new ProcessStartInfo()
+                    {
+                        WorkingDirectory=streamDir,
+                        FileName=args[0],
+                        Arguments=args.Length==1?null:args[1]
+                    }
+                };
+
+                proc.Start();
+
+                while(true)
+                {
+                    await Task.Delay(20);
+                    var files=Directory.GetFiles(streamDir,"*.m3u8");
+                    var exists=files.Any(f=>f.EndsWith(StreamName));
+                    cancel.ThrowIfCancellationRequested();
+                    clientCancel.ThrowIfCancellationRequested();
+                    if(exists){
                         break;
                     }
                 }
 
-                var header=Encoding.UTF8.GetString(buf,0,l-1);
-                var match=HeaderReg.Match(header);
-                if(!match.Success){
-                    throw new BadRequestException("Bad stream Uri");
-                }
+                ready.TrySetResult(true);
 
-                var token=match.Groups[2].Value;
+                var n=DateTime.UtcNow;
 
-                PrivatePortInfo info;
+                while(!cancel.IsCancellationRequested){
 
-                lock(_Sync){
-                    info=_OpenPorts.FirstOrDefault(p=>p.Info.Token==token);
-                    if(info==null || info.Connected){
-                        throw new UnauthorizedException();
+                    await Task.Delay(5000);
+
+                    if(session.Expirers<DateTime.UtcNow){
+                        _Logger.LogInformation("Client Stream expired");
+                        break;
                     }
-                    info.Connected=true;
-                }
 
-                using(var rtspClient=new TcpClient())
-                {
-                    rtspClient.NoDelay=true;
-                    rtspClient.ReceiveBufferSize=BufSize+100;
-                    await rtspClient.ConnectAsync(IPAddress.Parse("192.168.55.101"),554);
-
-                    using(var rtspStream=rtspClient.GetStream()){
-
-                        await rtspStream.WriteAsync(buf,0,l);
-
-                        var task1=CopyAsync(buf,stream,rtspStream,"Camera",cancel);
-                        var task2=CopyAsync(new byte[4096],rtspStream,stream,"FFPlay",cancel);
-                        
-                        await task1;
-                        await task2;
+                    proc.Refresh();
+                    if(proc.HasExited){
+                        throw new Exception("stream commanded existed with exit code "+proc.ExitCode);
                     }
-                }
 
+                }
 
             }catch(Exception ex){
-
-                _Logger.LogInformation(ex,"RunClientAsync");
-
+                if(!cancel.IsCancellationRequested && !(!ready.Task.IsCompleted && cancel.IsCancellationRequested)){
+                    _Logger.LogError(ex,"RunStreamAsync");
+                }
             }finally{
-                stream.SafeDispose();
-                try{client.Close();}catch{}
-                client.SafeDispose();
+                if(proc!=null){
+                    try{proc.Kill();}catch{}
+                    proc.SafeDispose();
+                }
+                try{
+                    if(Directory.Exists(streamDir)){
+                        Directory.Delete(streamDir,true);
+                    }
+                }catch{}
+                lock(_Sync){
+                    _Sessions.Remove(session);
+                }
             }
-            
-        }
 
-        private async Task CopyAsync(
-            byte[] buf,
-            Stream dest,
-            Stream src,
-            string printLabel,
-            CancellationToken cancel)
-        {
-            while(!cancel.IsCancellationRequested){
-                var l=await src.ReadAsync(buf,0,buf.Length,cancel);
-                if(l==0){
-                    break;
-                }
-                if(printLabel!=null){
-                    Console.WriteLine(printLabel+" - "+Encoding.ASCII.GetString(buf,0,l));
-                }
-                await dest.WriteAsync(buf,0,l,cancel);
-            }
         }
     }
 }

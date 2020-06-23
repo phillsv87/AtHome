@@ -16,6 +16,8 @@ the AtHome app to communicate with. All security related devices are setup on an
 - Setup FTP server
 - Install dotnet SDK
 - Install git - sudo apt-get install git
+- Install ffmpeg - sudo apt-get install ffmpeg
+- Install ngrok
 
 
 ## Setup static IP for isolated LAN
@@ -98,4 +100,16 @@ Add dotnet to PATH - nano ~/.bashrc
 ``` txt
 export DOTNET_ROOT=/usr/share/dotnet
 export PATH=$PATH:/usr/share/dotnet
+```
+
+
+### Install NGrok
+
+``` sh
+wget -O ngrok.zip https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-arm.zip
+unzip ngrok.zip
+rm ngrok.zip
+sudo mv ngrok /usr/local/bin
+# Get token from https://dashboard.ngrok.com/auth/your-authtoken
+ngrok authtoken <YOUR_AUTH_TOKEN>
 ```

@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NblWebCommon;
@@ -24,6 +26,8 @@ namespace HomeSecureApi
 
         public IConfiguration Configuration { get; }
 
+        private HsConfig _Config;
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -31,7 +35,7 @@ namespace HomeSecureApi
                 "HS_",
                 "../../apiconfig.json;../../secrets/apiconfig-secrets.json");
 
-            services.AddPrefixConfig<HsConfig>();
+            _Config=services.AddPrefixConfig<HsConfig>();
 
             services.AddUsingDescriptor<StreamingManager>();
                 
@@ -45,6 +49,18 @@ namespace HomeSecureApi
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            var provider = new FileExtensionContentTypeProvider();
+                provider.Mappings[".ts"] = "video/mp2t";
+                provider.Mappings[".m3u8"] = "application/vnd.apple.mpegurl";
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    System.IO.Path.GetFullPath(_Config.HlsRoot)
+                ),
+                RequestPath = "/Stream",
+                ContentTypeProvider=provider
+            });
 
             app.UseMiddleware<HttpExceptionMiddleware>();
 
