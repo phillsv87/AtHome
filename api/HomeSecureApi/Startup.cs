@@ -14,6 +14,8 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NblWebCommon;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace HomeSecureApi
 {
@@ -41,7 +43,12 @@ namespace HomeSecureApi
                 .AddUsingDescriptor<StreamingManager>()
                 .AddUsingDescriptor<MailNotifications>();
                 
-            services.AddControllers();
+            services
+                .AddControllers()
+                .AddNewtonsoftJson(o=>{
+                    o.SerializerSettings.ContractResolver=new DefaultContractResolver();
+                    o.SerializerSettings.ReferenceLoopHandling=ReferenceLoopHandling.Ignore;
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

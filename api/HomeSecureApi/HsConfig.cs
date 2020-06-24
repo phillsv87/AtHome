@@ -15,6 +15,8 @@ namespace HomeSecureApi
 
         public string StreamsConfig{get;set;}="../../streams.json";
 
+        public double StreamStartTimeoutSeconds{get;set;}=15;
+
 
         public int SmtpPort{get;set;}=25;
 

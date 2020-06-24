@@ -22,6 +22,13 @@ namespace HomeSecureApi.Controllers
             _Mgr=mgr;
         }
 
+
+        [HttpGet]
+        public Task<List<StreamInfo>> GetStreamInfo([FromQuery]string clientToken, CancellationToken cancel)
+        {
+            return _Mgr.GetStreamInfoAsync(clientToken,cancel);
+        }
+
         [HttpGet("{streamId}/Open")]
         public async Task<StreamSession> GetToken(
             [FromRoute]int streamId,
@@ -40,6 +47,17 @@ namespace HomeSecureApi.Controllers
             CancellationToken cancel)
         {
             return _Mgr.ExtendSession(streamId,sessionId,sessionToken,clientToken);
+        }
+
+        [HttpGet("{streamId}/Close/{sessionId}")]
+        public DateTime Close(
+            [FromRoute]int streamId,
+            [FromRoute]Guid sessionId,
+            [FromQuery]string clientToken,
+            [FromQuery]string sessionToken,
+            CancellationToken cancel)
+        {
+            return _Mgr.CloseSession(streamId,sessionId,sessionToken,clientToken);
         }
     }
 }

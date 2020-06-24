@@ -7,5 +7,15 @@ namespace HomeSecureApi.Models
         public string Name{get;set;}
 
         public string Uri{get;set;}
+
+
+        public StreamInfo GetInfo()
+        {
+            return new StreamInfo()
+            {
+                Id=Id,
+                Name=Name,
+            };
+        }
     }
 }

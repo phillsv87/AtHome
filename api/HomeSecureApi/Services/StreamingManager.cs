@@ -66,16 +66,8 @@ namespace HomeSecureApi.Services
             return _StreamConfigs;
         }
 
-        /// <summary>
-        /// Extends a StreamSession
-        /// </summary>
-        public DateTime ExtendSession(int streamId, Guid sessionId, string sessionToken, string clientToken)
+        private StreamSession GetSession(int streamId, Guid sessionId, string sessionToken)
         {
-
-            if(clientToken!=_Config.ClientToken){
-                throw new UnauthorizedException();
-            }
-
             StreamSession session;
             lock(_Sync){
                 session=_Sessions.FirstOrDefault(s=>s.Id==sessionId);
@@ -88,6 +80,52 @@ namespace HomeSecureApi.Services
             if(session.Token!=sessionToken){
                 throw new UnauthorizedException();
             }
+
+            return session;
+        }
+
+        /// <summary>
+        /// Get a list of all streams availble
+        /// </summary>
+        public async Task<List<StreamInfo>> GetStreamInfoAsync(string clientToken,CancellationToken cancel)
+        {
+
+            if(clientToken!=_Config.ClientToken){
+                throw new UnauthorizedException();
+            }
+
+            var streams=await GetStreamConfigsAsync(cancel);
+
+            return streams.Select(s=>s.GetInfo()).ToList();
+
+        }
+
+        /// <summary>
+        /// Closes a StreamSession
+        /// </summary>
+        public DateTime CloseSession(int streamId, Guid sessionId, string sessionToken, string clientToken)
+        {
+            if(clientToken!=_Config.ClientToken){
+                throw new UnauthorizedException();
+            }
+
+            var session=GetSession(streamId,sessionId,sessionToken);
+
+            session.Expirers=DateTime.UtcNow.AddMinutes(-1);
+
+            return session.Expirers;
+        }
+
+        /// <summary>
+        /// Extends a StreamSession
+        /// </summary>
+        public DateTime ExtendSession(int streamId, Guid sessionId, string sessionToken, string clientToken)
+        {
+            if(clientToken!=_Config.ClientToken){
+                throw new UnauthorizedException();
+            }
+
+            var session=GetSession(streamId,sessionId,sessionToken);
 
             session.Expirers=DateTime.UtcNow.AddSeconds(_Config.ClientSessionTTLSeconds);
 
@@ -218,8 +256,12 @@ namespace HomeSecureApi.Services
 
                 proc.Start();
 
+                var timeout=DateTime.UtcNow.AddSeconds(_Config.StreamStartTimeoutSeconds);
                 while(true)
                 {
+                    if(DateTime.UtcNow>timeout){
+                        throw new RequestException(408,"Start start timeout");
+                    }
                     await Task.Delay(20);
                     var files=Directory.GetFiles(streamDir,"*.m3u8");
                     var exists=files.Any(f=>f.EndsWith(StreamName));
