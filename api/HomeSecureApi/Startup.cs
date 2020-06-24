@@ -37,13 +37,18 @@ namespace HomeSecureApi
 
             _Config=services.AddPrefixConfig<HsConfig>();
 
-            services.AddUsingDescriptor<StreamingManager>();
+            services
+                .AddUsingDescriptor<StreamingManager>()
+                .AddUsingDescriptor<MailNotifications>();
                 
             services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(
+            IApplicationBuilder app,
+            IWebHostEnvironment env,
+            MailNotifications mailNotifications)
         {
             if (env.IsDevelopment())
             {
@@ -74,6 +79,8 @@ namespace HomeSecureApi
             {
                 endpoints.MapControllers();
             });
+
+            mailNotifications.Start();
         }
     }
 }

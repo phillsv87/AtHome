@@ -14,5 +14,12 @@ namespace HomeSecureApi
         public string HlsRoot{get;set;}="../../streams";
 
         public string StreamsConfig{get;set;}="../../streams.json";
+
+
+        public int SmtpPort{get;set;}=25;
+
+        public string SmtpListenAddress{get;set;}="0.0.0.0";
+
+        public bool SmtpDebug{get;set;}
     }
 }
