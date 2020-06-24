@@ -2,6 +2,9 @@ namespace HomeSecureApi
 {
     public class HsConfig
     {
+
+        public string LocationId{get;set;}
+
         public string ClientToken{get;set;}
 
         public double ClientSessionTTLSeconds{get;set;}=60;

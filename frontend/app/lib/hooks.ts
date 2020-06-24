@@ -1,6 +1,5 @@
 import HsApp from "./HsApp";
 import { useContext, useState, useMemo, useEffect } from "react";
-import { useEmitter } from "CommonJs/EventEmitterEx-rn";
 import React from "react";
 import HsConfig from "./HsConfig";
 import { getCurrentTime } from "../CommonJs/commonUtils";

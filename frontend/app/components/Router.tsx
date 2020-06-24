@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Text, Animated, View } from 'react-native';
+import { Animated, View } from 'react-native';
 import Page from './Page';
 import { ViewRoute, ViewMatch, Navigation } from '../CommonJs/Navigation-rn';
 import NavigationAnimation, { NavigationAnimationTypes, shouldUseNativeDriver } from '../CommonJs/NavigationAnimation-rn';
@@ -7,19 +7,39 @@ import { useApp } from '../lib/hooks';
 import Stream from './Stream';
 import HsApp from '../lib/HsApp';
 import StreamList from './StreamList';
+import Locations from './Locations';
+import { unused } from '../CommonJs/commonUtils';
+import AddLocation from './AddLocation';
+import LocationConfig from './LocationConfig';
 
 /* eslint react/display-name:0 */
 function getRoutes(app:HsApp):ViewRoute[]{
+    unused(app);
     return [
         {
             path:'/',
             postRender: page,
-            render:(m)=><StreamList/>
+            render:()=><Locations/>
         },
         {
-            match:/^\/stream\/(\d+)$/i,
+            path:'/add-location',
+            postRender: page,
+            render:()=><AddLocation/>
+        },
+        {
+            match:/^\/location\/([^/]+)\/stream\/(\d+)$/i,
             postRender: pageSlim,
-            render:(m)=><Stream streamId={m.paramNumber(0)}/>
+            render:(m)=><Stream locationId={m.param(0)||undefined} streamId={m.paramNumber(1)}/>
+        },
+        {
+            match:/^\/location\/([^/]+)\/config$/i,
+            postRender: page,
+            render:(m)=><LocationConfig locationId={m.param(0)||undefined}/>
+        },
+        {
+            match:/^\/location\/([^/]+)$/i,
+            postRender: page,
+            render:(m)=><StreamList locationId={m.param(0)||undefined}/>
         },
     ];
 }

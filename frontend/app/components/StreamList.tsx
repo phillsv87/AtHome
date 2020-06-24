@@ -3,48 +3,50 @@ import { useApp } from '../lib/hooks';
 import { useAsync } from '../CommonJs/AsyncHooks';
 import Log from '../CommonJs/Log';
 import { StreamInfo } from '../lib/types';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Button } from 'react-native';
 import Busy from './Busy';
+import ListItem from './ListItem';
 
-export default function StreamList()
+interface StreamListProps
 {
+    locationId?:string;
+}
 
-    const {http,config,clientToken,history}=useApp();
+export default function StreamList({
+    locationId
+}:StreamListProps){
+
+    const {http,config,history,locations}=useApp();
+
+    const location=locations.getLocation(locationId);
 
     const streams=useAsync(null,async ()=>{
 
+        if(!location){
+            return null;
+        }
+
         try{
 
-            return await http.getAsync<StreamInfo[]>(`api/Stream`,{clientToken});
+            return await http.getAsync<StreamInfo[]>(`${location.ApiBaseUrl}api/Stream`,{ClientToken:location.Token});
 
         }catch(ex){
             Log.error('Unable to load stream list',ex);
         }
 
-    },[http,config,clientToken]);
+    },[http,config,location]);
 
-    if(!streams){
+    if(!streams || !location){
         return <Busy/>
     }
 
     return (
-        <>
+        <View>
             {streams.map((s)=>(
-                <TouchableOpacity key={s.Id} style={styles.item} onPress={()=>history.push('/stream/'+s.Id)}>
-                    <View>
-                        <Text>{s.Name}</Text>
-                    </View>
-                </TouchableOpacity>
+                <ListItem title={s.Name} key={s.Id} onPress={()=>history.push(`/location/${location.Id}/stream/${s.Id}`)} />
             ))}
-        </>
+            <Button title="Config" onPress={()=>history.push(`/location/${location.Id}/config`)}/>
+        </View>
     )
 
 }
-
-
-const styles=StyleSheet.create({
-    item:{
-       padding:10,
-       margin:10
-    }
-});

@@ -11,27 +11,31 @@ import Video from 'react-native-video';
 
 interface StreamProps
 {
+    locationId?:string;
     streamId?:number;
 }
 
 export default function Stream({
+    locationId,
     streamId
 }:StreamProps){
 
-    const {config,http,clientToken}=useApp();
+    const {config,http,locations}=useApp();
+
+    const location=locations.getLocation(locationId);
 
     const [session,setSession]=useState<null|StreamSession>(null);
 
     useEffect(()=>{
 
-        if(!clientToken || streamId===undefined){
+        if(!location || streamId===undefined){
             return;
         }
         let m=true;
         let session:StreamSession|null=null;
         const run=async ()=>{
             try{
-                session=await http.getAsync<StreamSession>(`api/Stream/${streamId}/Open`,{clientToken});
+                session=await http.getAsync<StreamSession>(`${location.ApiBaseUrl}api/Stream/${streamId}/Open`,{ClientToken:location.Token});
                 if(!m){return;}
                 setSession(session);
             }catch(ex){
@@ -43,7 +47,7 @@ export default function Stream({
                 while(m){
                     await delayAsync(session.TTLSeconds*1000*0.75);
                     if(!m){break;}
-                    await http.getAsync(`api/Stream/${streamId}/Extend/${session.Id}`,{clientToken,sessionToken:session.Token})
+                    await http.getAsync(`${location.ApiBaseUrl}api/Stream/${streamId}/Extend/${session.Id}`,{ClientToken:location.Token,sessionToken:session.Token})
                 }
             }catch(ex){
                 Log.error('Unable to extend streaming session');
@@ -55,7 +59,7 @@ export default function Stream({
         const close=async ()=>{
             try{
                 if(session){
-                    await http.getAsync(`api/Stream/${streamId}/Close/${session.Id}`,{clientToken,sessionToken:session.Token});
+                    await http.getAsync(`${location.ApiBaseUrl}api/Stream/${streamId}/Close/${session.Id}`,{ClientToken:location.Token,sessionToken:session.Token});
                 }
             }catch{}
         }
@@ -63,14 +67,14 @@ export default function Stream({
         return ()=>{m=false;close()}
 
 
-    },[streamId,config,http,clientToken]);
+    },[streamId,config,http,location]);
 
     return (
         <View style={styles.root}>
-            {session?
+            {session && location?
                 <Video
                     style={styles.video}
-                    source={{uri:config.ApiBaseUrl+session.Uri}}/>
+                    source={{uri:location.ApiBaseUrl+session.Uri}}/>
                 :
                 <Busy/>
             }

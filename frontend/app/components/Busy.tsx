@@ -4,15 +4,17 @@ import { absFill } from '../lib/style';
 
 interface BusyProps
 {
-    
+    touchable?:boolean;
+    backgroundColor?:string;
 }
 
 export default function Busy({
-
+    touchable=false,
+    backgroundColor='#00000000'
 }:BusyProps){
 
     return (
-        <View pointerEvents="none" style={styles.root}>
+        <View pointerEvents={touchable?"auto":"none"} style={[styles.root,{backgroundColor}]}>
             <ActivityIndicator/>
         </View>
     )

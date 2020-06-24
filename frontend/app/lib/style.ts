@@ -60,3 +60,11 @@ export const centerContentFill:any={
     justifyContent:'center',
     alignItems:'center'
 }
+
+export const inputStyle:any={
+    margin:10,
+    padding:10,
+    backgroundColor:'#fff',
+    borderRadius:3,
+    color:'#333'
+}

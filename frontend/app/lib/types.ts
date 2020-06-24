@@ -22,3 +22,19 @@ export interface StreamInfo
 
     Name: string;
 }
+
+
+export interface Location
+{
+    Id:string;
+    Name:string;
+    ApiBaseUrl:string;
+    Token:string;
+}
+
+export interface ApiInfo
+{
+    Id: string;
+
+    Version: string;
+}
