@@ -4,6 +4,7 @@ import Http from "../CommonJs/Http";
 import AsyncObjStore from "../CommonJs/AsyncObjStore";
 import AsyncObjStoreRn from "../CommonJs/AsyncObjStore-rn";
 import LocationManager from "./LocationManager";
+import { NativeDevice } from "./NativeDevice";
 
 export default class HsApp
 {
@@ -26,6 +27,8 @@ export default class HsApp
 
     // App specific services
 
+    public readonly device:NativeDevice;
+
     public readonly locations:LocationManager;
 
     constructor(config:HsConfig)
@@ -36,17 +39,19 @@ export default class HsApp
         this.history.logChanges=true;
         this.store=new AsyncObjStoreRn('home-secure');
         this.http=new Http('',true);
+        this.device=new NativeDevice(this);
         this.locations=new LocationManager(this);
     }
 
     public async initAsync():Promise<boolean>
     {
+        await this.device.initAsync();
         await this.locations.initAsync();
         return true;
     }
 
     public dispose()
     {
-        
+        this.device.dispose();
     }
 }

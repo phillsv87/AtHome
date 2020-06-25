@@ -1,5 +1,13 @@
 {
     "AUTO_PREFIX":true,
     
-    "LocationId":"365915e9-0ec5-4eba-ac9f-48202d60a40a"
+    "LocationId":"365915e9-0ec5-4eba-ac9f-48202d60a40a",
+
+    "DEV__ApnDomain": "api.development.push.apple.com",
+    "ApnTopic": "com.newbaselogic.homesecure",
+    "DEV__ApnSecretPath": "../../secrets/HomeSecurePush.p8",
+    "ApnKid": "KAUS5N5W33",
+    "ApnIss": "63LYZZE65Z",
+
+    "DEV__NotificationDeviceDb":"../../NotificationDevices.json"
 }

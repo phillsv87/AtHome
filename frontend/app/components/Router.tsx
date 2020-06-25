@@ -6,10 +6,9 @@ import NavigationAnimation, { NavigationAnimationTypes, shouldUseNativeDriver } 
 import { useApp } from '../lib/hooks';
 import Stream from './Stream';
 import HsApp from '../lib/HsApp';
-import StreamList from './StreamList';
+import Location from './Location';
 import Locations from './Locations';
 import { unused } from '../CommonJs/commonUtils';
-import AddLocation from './AddLocation';
 import LocationConfig from './LocationConfig';
 
 /* eslint react/display-name:0 */
@@ -24,7 +23,7 @@ function getRoutes(app:HsApp):ViewRoute[]{
         {
             path:'/add-location',
             postRender: page,
-            render:()=><AddLocation/>
+            render:()=><LocationConfig add/>
         },
         {
             match:/^\/location\/([^/]+)\/stream\/(\d+)$/i,
@@ -39,7 +38,7 @@ function getRoutes(app:HsApp):ViewRoute[]{
         {
             match:/^\/location\/([^/]+)$/i,
             postRender: page,
-            render:(m)=><StreamList locationId={m.param(0)||undefined}/>
+            render:(m)=><Location locationId={m.param(0)||undefined}/>
         },
     ];
 }

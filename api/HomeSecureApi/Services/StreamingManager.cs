@@ -87,12 +87,8 @@ namespace HomeSecureApi.Services
         /// <summary>
         /// Get a list of all streams availble
         /// </summary>
-        public async Task<List<StreamInfo>> GetStreamInfoAsync(string clientToken,CancellationToken cancel)
+        public async Task<List<StreamInfo>> GetStreamInfoAsync(CancellationToken cancel)
         {
-
-            if(clientToken!=_Config.ClientToken){
-                throw new UnauthorizedException();
-            }
 
             var streams=await GetStreamConfigsAsync(cancel);
 
@@ -103,11 +99,8 @@ namespace HomeSecureApi.Services
         /// <summary>
         /// Closes a StreamSession
         /// </summary>
-        public DateTime CloseSession(int streamId, Guid sessionId, string sessionToken, string clientToken)
+        public DateTime CloseSession(int streamId, Guid sessionId, string sessionToken)
         {
-            if(clientToken!=_Config.ClientToken){
-                throw new UnauthorizedException();
-            }
 
             var session=GetSession(streamId,sessionId,sessionToken);
 
@@ -119,11 +112,8 @@ namespace HomeSecureApi.Services
         /// <summary>
         /// Extends a StreamSession
         /// </summary>
-        public DateTime ExtendSession(int streamId, Guid sessionId, string sessionToken, string clientToken)
+        public DateTime ExtendSession(int streamId, Guid sessionId, string sessionToken)
         {
-            if(clientToken!=_Config.ClientToken){
-                throw new UnauthorizedException();
-            }
 
             var session=GetSession(streamId,sessionId,sessionToken);
 
@@ -138,13 +128,8 @@ namespace HomeSecureApi.Services
         /// </summary>
         public async Task<StreamSession> OpenStreamAsync(
             int streamId,
-            string clientToken,
             CancellationToken cancel)
         {
-
-            if(clientToken!=_Config.ClientToken){
-                throw new UnauthorizedException();
-            }
 
             var streamConfig=(await GetStreamConfigsAsync(cancel)).FirstOrDefault(s=>s.Id==streamId);
 

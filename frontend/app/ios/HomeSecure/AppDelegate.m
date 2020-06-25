@@ -3,6 +3,7 @@
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
+#import "HomeSecure-Swift.h"
 
 #if DEBUG
 #import <FlipperKit/FlipperClient.h>
@@ -42,6 +43,9 @@ static void InitializeFlipper(UIApplication *application) {
   UIViewController *rootViewController = [UIViewController new];
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
+  
+  [HomeSecureApp onStart];
+  
   [self.window makeKeyAndVisible];
   return YES;
 }
@@ -53,6 +57,23 @@ static void InitializeFlipper(UIApplication *application) {
 #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
+}
+
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
+{
+  NSLog(@"Remote notifications registration failed");
+}
+
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*) data
+{
+  [[HomeSecureApp current] setDeviceId:data];
+}
+-(void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
+  id action=[userInfo objectForKey:@"appAction"];
+  if(action && [action isKindOfClass:[NSString class]]){
+    [[HomeSecureApp current] setAppAction:(NSString*)action];
+  }
 }
 
 @end

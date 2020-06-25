@@ -14,6 +14,8 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		29316EBB3EFF3089D496646E /* libPods-HomeSecure.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2DEDC9CA6CC0EE508C91892 /* libPods-HomeSecure.a */; };
+		2A86F10124A51DB100BA1F25 /* HomeSecureDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A86F10024A51DB100BA1F25 /* HomeSecureDelegate.m */; };
+		2A86F10424A51F5500BA1F25 /* HomeSecureApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A86F10324A51F5500BA1F25 /* HomeSecureApp.swift */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
@@ -53,6 +55,11 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = HomeSecure/main.m; sourceTree = "<group>"; };
 		157069F4C354D5573731A15E /* Pods-HomeSecure-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HomeSecure-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-HomeSecure-tvOSTests/Pods-HomeSecure-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		19EAA1C962324C71F2B1F5D8 /* libPods-HomeSecure-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HomeSecure-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A86F0FE24A51ABA00BA1F25 /* HomeSecure.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = HomeSecure.entitlements; path = HomeSecure/HomeSecure.entitlements; sourceTree = "<group>"; };
+		2A86F0FF24A51D7D00BA1F25 /* HomeSecureDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HomeSecureDelegate.h; sourceTree = "<group>"; };
+		2A86F10024A51DB100BA1F25 /* HomeSecureDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HomeSecureDelegate.m; sourceTree = "<group>"; };
+		2A86F10224A51F5400BA1F25 /* HomeSecure-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HomeSecure-Bridging-Header.h"; sourceTree = "<group>"; };
+		2A86F10324A51F5500BA1F25 /* HomeSecureApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSecureApp.swift; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* HomeSecure-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "HomeSecure-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* HomeSecure-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "HomeSecure-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A693E6CE3ECEA53241995F8 /* Pods-HomeSecure-HomeSecureTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HomeSecure-HomeSecureTests.release.xcconfig"; path = "Target Support Files/Pods-HomeSecure-HomeSecureTests/Pods-HomeSecure-HomeSecureTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -125,13 +132,18 @@
 		13B07FAE1A68108700A75B9A /* HomeSecure */ = {
 			isa = PBXGroup;
 			children = (
+				2A86F0FE24A51ABA00BA1F25 /* HomeSecure.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
+				2A86F0FF24A51D7D00BA1F25 /* HomeSecureDelegate.h */,
+				2A86F10024A51DB100BA1F25 /* HomeSecureDelegate.m */,
+				2A86F10324A51F5500BA1F25 /* HomeSecureApp.swift */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				2A86F10224A51F5400BA1F25 /* HomeSecure-Bridging-Header.h */,
 			);
 			name = HomeSecure;
 			sourceTree = "<group>";
@@ -294,7 +306,7 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = 63LYZZE65Z;
-						LastSwiftMigration = 1120;
+						LastSwiftMigration = 1150;
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -630,6 +642,8 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				2A86F10124A51DB100BA1F25 /* HomeSecureDelegate.m in Sources */,
+				2A86F10424A51F5500BA1F25 /* HomeSecureApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -682,6 +696,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 515250EBAF4D0FF5C87D89C9 /* Pods-HomeSecure-HomeSecureTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -705,6 +720,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3A693E6CE3ECEA53241995F8 /* Pods-HomeSecure-HomeSecureTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = HomeSecureTests/Info.plist;
@@ -727,6 +743,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = HomeSecure/HomeSecure.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 63LYZZE65Z;
 				ENABLE_BITCODE = NO;
@@ -744,6 +761,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.newbaselogic.homesecure;
 				PRODUCT_NAME = HomeSecure;
+				SWIFT_OBJC_BRIDGING_HEADER = "HomeSecure-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -756,6 +774,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = HomeSecure/HomeSecure.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 63LYZZE65Z;
 				INFOPLIST_FILE = HomeSecure/Info.plist;
@@ -768,6 +787,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.newbaselogic.homesecure;
 				PRODUCT_NAME = HomeSecure;
+				SWIFT_OBJC_BRIDGING_HEADER = "HomeSecure-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

@@ -30,6 +30,7 @@ export interface Location
     Name:string;
     ApiBaseUrl:string;
     Token:string;
+    ReceiveNotifications:boolean;
 }
 
 export interface ApiInfo
@@ -37,4 +38,15 @@ export interface ApiInfo
     Id: string;
 
     Version: string;
+}
+
+export enum NotificationType {
+    Other = 0,
+    APN = 1,
+}
+
+export interface NotificationDevice
+{
+    Id: string;
+    Type: NotificationType;
 }

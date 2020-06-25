@@ -68,3 +68,10 @@ export const inputStyle:any={
     borderRadius:3,
     color:'#333'
 }
+
+export const inputLineStyle:any={
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between',
+    margin:10
+}

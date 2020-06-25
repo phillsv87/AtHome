@@ -41,7 +41,8 @@ namespace HomeSecureApi
 
             services
                 .AddUsingDescriptor<StreamingManager>()
-                .AddUsingDescriptor<MailNotifications>();
+                .AddUsingDescriptor<MailNotifications>()
+                .AddUsingDescriptor<NotificationsManager>();
                 
             services
                 .AddControllers()

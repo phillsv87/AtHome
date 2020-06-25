@@ -35,7 +35,7 @@ export default function Stream({
         let session:StreamSession|null=null;
         const run=async ()=>{
             try{
-                session=await http.getAsync<StreamSession>(`${location.ApiBaseUrl}api/Stream/${streamId}/Open`,{ClientToken:location.Token});
+                session=await http.getAsync<StreamSession>(`${location.ApiBaseUrl}api/Stream/${streamId}/Open`,{clientToken:location.Token});
                 if(!m){return;}
                 setSession(session);
             }catch(ex){
@@ -47,7 +47,7 @@ export default function Stream({
                 while(m){
                     await delayAsync(session.TTLSeconds*1000*0.75);
                     if(!m){break;}
-                    await http.getAsync(`${location.ApiBaseUrl}api/Stream/${streamId}/Extend/${session.Id}`,{ClientToken:location.Token,sessionToken:session.Token})
+                    await http.getAsync(`${location.ApiBaseUrl}api/Stream/${streamId}/Extend/${session.Id}`,{clientToken:location.Token,sessionToken:session.Token})
                 }
             }catch(ex){
                 Log.error('Unable to extend streaming session');
@@ -59,7 +59,7 @@ export default function Stream({
         const close=async ()=>{
             try{
                 if(session){
-                    await http.getAsync(`${location.ApiBaseUrl}api/Stream/${streamId}/Close/${session.Id}`,{ClientToken:location.Token,sessionToken:session.Token});
+                    await http.getAsync(`${location.ApiBaseUrl}api/Stream/${streamId}/Close/${session.Id}`,{clientToken:location.Token,sessionToken:session.Token});
                 }
             }catch{}
         }

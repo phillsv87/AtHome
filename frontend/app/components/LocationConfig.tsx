@@ -1,24 +1,66 @@
 import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, Text, TextInput, Button } from 'react-native';
-import { useApp } from '../lib/hooks';
-import { inputStyle } from '../lib/style';
+import { View, StyleSheet, TextInput, Button, Switch, Text } from 'react-native';
 import { useMounted } from '../CommonJs/Hooks';
+import { useApp } from '../lib/hooks';
+import Log from '../CommonJs/Log';
+import Busy from './Busy';
+import { inputStyle, inputLineStyle } from '../lib/style';
+import { delayAsync } from '../CommonJs/utilTs';
 
 interface LocationConfigProps
 {
+    add?:boolean;
     locationId?:string;
 }
 
 export default function LocationConfig({
+    add,
     locationId
 }:LocationConfigProps){
 
-    const {locations,history}=useApp();
+    const mt=useMounted();
 
-    const location=locations.getLocation(locationId);
+    const {locations,history}=useApp();
+    const location=locations.getLocation(locationId)
+
+    const [name,setName]=useState(location?.Name||'');
+    const [url,setUrl]=useState(location?.ApiBaseUrl||'');
+    const [token,setToken]=useState(location?.Token||'');
+    const [notifications,setNotifications]=useState(location?location.ReceiveNotifications:true);
+
+    const [busy,setBusy]=useState(false);
+
+    
+    const submit=useCallback(async ()=>{
+
+        if(busy){
+            return;
+        }
+
+        if(!name || !url || !token){
+            Log.error('Name, Url and Token required');
+            return;
+        }
+
+        setBusy(true);
+        try{
+            await locations.setLocationAsync(location?location.Id:null,name,url,token,notifications);
+            await delayAsync(1500);
+        }catch(ex){
+            Log.error('Unable to '+(add?'add':'save')+' location - '+ex.message,ex);
+            return;
+        }finally{
+            setBusy(false);
+        }
+        if(!mt.mounted){return;}
+
+        if(add){
+            history.reset('/');
+        }
+
+    },[name,url,token,notifications,busy,mt,locations,history,add,location]);
 
     const [confirmDelete,setConfirmDelete]=useState(false);
-    const mt=useMounted();
     const deleteLocation=useCallback(async ()=>{
 
         if(!location){
@@ -31,23 +73,27 @@ export default function LocationConfig({
 
     },[mt,locations,location,history]);
 
-    if(locationId===undefined){
-        return null;
-    }
-
-    if(!location){
-        return <Text>Invalid Location Id - {locationId}</Text>;
-    }
-
     return (
-        <View style={styles.root}>
+        <>
+            <View style={[styles.root,{opacity:busy?0.3:1}]}>
+                <TextInput style={inputStyle} placeholderTextColor="#bbb" placeholder="Name" value={name} onChangeText={v=>setName(v)} />
+                <TextInput style={inputStyle} placeholderTextColor="#bbb" placeholder="Url" value={url} onChangeText={v=>setUrl(v)} />
+                {add&&<TextInput style={inputStyle} placeholderTextColor="#bbb" placeholder="Token" value={token} onChangeText={v=>setToken(v)} />}
+                <View style={inputLineStyle}>
+                    <Text>Receive Notifications</Text>
+                    <Switch value={notifications} onValueChange={setNotifications} />
+                </View>
 
-            <TextInput style={inputStyle} placeholderTextColor="#bbb" placeholder="Name" value={location.Name}/>
-            <TextInput style={inputStyle} placeholderTextColor="#bbb" placeholder="Url" value={location.ApiBaseUrl} />
 
-            {!confirmDelete&&<Button title="Delete" onPress={()=>setConfirmDelete(true)} />}
-            {confirmDelete&&<Button title="Really Delete" onPress={deleteLocation} />}
-        </View>
+                <Button title={add?'Add':'Save'} onPress={submit} />
+
+                {!add&&<>
+                    {!confirmDelete&&<Button title="Delete" onPress={()=>setConfirmDelete(true)} />}
+                    {confirmDelete&&<Button title="Really Delete" onPress={deleteLocation} />}
+                </>}
+            </View>
+            {busy&&<Busy touchable/>}
+        </>
     )
 
 }

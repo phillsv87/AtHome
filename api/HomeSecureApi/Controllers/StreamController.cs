@@ -17,16 +17,20 @@ namespace HomeSecureApi.Controllers
 
         private readonly StreamingManager _Mgr;
 
-        public StreamController(StreamingManager mgr)
+        private readonly HsConfig _Config;
+
+        public StreamController(StreamingManager mgr, HsConfig config)
         {
             _Mgr=mgr;
+            _Config=config;
         }
 
 
         [HttpGet]
         public Task<List<StreamInfo>> GetStreamInfo([FromQuery]string clientToken, CancellationToken cancel)
         {
-            return _Mgr.GetStreamInfoAsync(clientToken,cancel);
+            _Config.VerifyClientToken(clientToken);
+            return _Mgr.GetStreamInfoAsync(cancel);
         }
 
         [HttpGet("{streamId}/Open")]
@@ -35,7 +39,8 @@ namespace HomeSecureApi.Controllers
             [FromQuery]string clientToken,
             CancellationToken cancel)
         {
-            return await _Mgr.OpenStreamAsync(streamId,clientToken,cancel);
+            _Config.VerifyClientToken(clientToken);
+            return await _Mgr.OpenStreamAsync(streamId,cancel);
         }
 
         [HttpGet("{streamId}/Extend/{sessionId}")]
@@ -46,7 +51,8 @@ namespace HomeSecureApi.Controllers
             [FromQuery]string sessionToken,
             CancellationToken cancel)
         {
-            return _Mgr.ExtendSession(streamId,sessionId,sessionToken,clientToken);
+            _Config.VerifyClientToken(clientToken);
+            return _Mgr.ExtendSession(streamId,sessionId,sessionToken);
         }
 
         [HttpGet("{streamId}/Close/{sessionId}")]
@@ -57,7 +63,8 @@ namespace HomeSecureApi.Controllers
             [FromQuery]string sessionToken,
             CancellationToken cancel)
         {
-            return _Mgr.CloseSession(streamId,sessionId,sessionToken,clientToken);
+            _Config.VerifyClientToken(clientToken);
+            return _Mgr.CloseSession(streamId,sessionId,sessionToken);
         }
     }
 }
