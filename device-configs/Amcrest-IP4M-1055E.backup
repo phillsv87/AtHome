@@ -259,22 +259,22 @@
                     },
                     "AudioEnable": false,
                     "Video": {
-                        "BitRate": 256,
-                        "BitRateControl": "CBR",
+                        "BitRate": 768,
+                        "BitRateControl": "VBR",
                         "Compression": "H.264",
                         "CustomResolutionName": "VGA",
-                        "FPS": 10,
-                        "GOP": 20,
+                        "FPS": 5,
+                        "GOP": 10,
                         "Height": 480,
                         "Pack": "DHAV",
                         "Priority": 0,
                         "Profile": "High",
-                        "Quality": 4,
+                        "Quality": 2,
                         "QualityRange": 6,
                         "SVCTLayer": 1,
                         "Width": 640
                     },
-                    "VideoEnable": false
+                    "VideoEnable": true
                 },
                 {
                     "Audio": {
@@ -342,7 +342,7 @@
                     },
                     "AudioEnable": false,
                     "Video": {
-                        "BitRate": 2048,
+                        "BitRate": 1536,
                         "BitRateControl": "VBR",
                         "Compression": "H.264",
                         "CustomResolutionName": "2688x1520",
@@ -370,7 +370,7 @@
                     },
                     "AudioEnable": false,
                     "Video": {
-                        "BitRate": 2048,
+                        "BitRate": 1536,
                         "BitRateControl": "VBR",
                         "Compression": "H.264",
                         "CustomResolutionName": "2688x1520",
@@ -398,7 +398,7 @@
                     },
                     "AudioEnable": false,
                     "Video": {
-                        "BitRate": 2048,
+                        "BitRate": 1536,
                         "BitRateControl": "VBR",
                         "Compression": "H.264",
                         "CustomResolutionName": "2688x1520",
@@ -533,7 +533,7 @@
         {
             "Enable": true,
             "Key": "1",
-            "String": "BackYard"
+            "String": "{{{NAME}}}"
         }
     ],
     "VideoWidget": [
@@ -1880,9 +1880,9 @@
         "UpdatePeriod": 10
     },
     "Email": {
-        "Address": "none",
+        "Address": "{{{API_ADDRESS}}}",
         "Anonymous": false,
-        "AttachEnable": true,
+        "AttachEnable": false,
         "Authentication": true,
         "Enable": true,
         "HealthReport": {
@@ -1891,13 +1891,11 @@
         },
         "OnlyAttachment": false,
         "Password": "none",
-        "Port": 25,
+        "Port": 2525,
         "Receivers": [
-            "",
-            "",
-            ""
+            "{{{NAME}}}@homesecure.team"
         ],
-        "SendAddress": "none",
+        "SendAddress": "{{{NAME}}}@homesecure.team",
         "SendInterv": 0,
         "SslEnable": false,
         "Title": "IPC Message",
@@ -1983,7 +1981,7 @@
                     "FilckerTimes": 5
                 },
                 "LogEnable": true,
-                "MailEnable": false,
+                "MailEnable": true,
                 "Matrix": 1,
                 "MatrixChannels": [
                     0
@@ -3917,16 +3915,16 @@
     ],
     "NAS": [
         {
-            "Address": "192.168.55.100",
+            "Address": "{{{API_ADDRESS}}}",
             "CharacterEncoding": "UTF-8",
             "Directory": "",
             "Enable": true,
             "Name": "FTP1",
-            "Password": "bGRaR2huMmVXYWNURkM5RHp",
+            "Password": "{{{FTP_PASSWORD}}}",
             "Port": 21,
             "Protocol": "FTP",
             "TimeOut": 10000,
-            "UserName": "homer"
+            "UserName": "{{{FTP_USER}}}"
         },
         {
             "Address": "0.0.0.0",
