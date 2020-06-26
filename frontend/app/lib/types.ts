@@ -50,3 +50,10 @@ export interface NotificationDevice
     Id: string;
     Type: NotificationType;
 }
+
+export interface LocationAlert
+{
+    Id: string;
+
+    Stream: StreamInfo;
+}

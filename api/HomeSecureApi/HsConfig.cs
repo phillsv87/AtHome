@@ -27,6 +27,8 @@ namespace HomeSecureApi
 
         public bool SmtpDebug{get;set;}
 
+        public bool SmtpDumpMessages{get;set;}
+
         /// <summary>
         /// A key that is used to secure a verity of utility endpoints
         /// </summary>

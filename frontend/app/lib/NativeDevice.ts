@@ -2,11 +2,14 @@ import HsApp from "./HsApp";
 import { NativeModules } from "react-native";
 import util from "../CommonJs/util";
 import EventEmitterEx from "../CommonJs/EventEmitterEx-rn";
+import { LocationAlert } from "./types";
+import Log from "../CommonJs/Log";
 
 const Delegate = NativeModules.HomeSecureDelegate;
 
 export const StateChangeEvent=Symbol();
 
+const appActionSplit='||||';
 
 const storeKey='NativeDevice';
 
@@ -79,7 +82,6 @@ export class NativeDevice extends EventEmitterEx
                     state=createDefaultNativeState();
                 }
                 if(!util.areEqualShallow(state,this.currentState)){
-                    this.currentState=state;
                     this.onStateChange(state);
                 }
                 if(!this.running){
@@ -104,11 +106,34 @@ export class NativeDevice extends EventEmitterEx
         }
 
         if(state.appAction && state.appAction!==this.currentState.appAction){
-            const actionBody=state.appAction.split('||||');
-            const action=actionBody[1].split(':');
-            switch(action[0]){
-                case 'share-screen':
-                    this.app.history.reset('/share-screen');
+            let i=state.appAction.indexOf(appActionSplit);
+            const actionBody=state.appAction.substr(i+appActionSplit.length);
+            i=actionBody.indexOf(':');
+            let actionType:string;
+            let actionPayload:string;
+            if(i===-1){
+                actionType=actionBody;
+                actionPayload='';
+            }else{
+                actionType=actionBody.substr(0,i);
+                actionPayload=actionBody.substr(i+1);;
+            }
+
+            switch(actionType){
+                case 'LocationAlert':
+                    if(actionPayload){
+                        const at:LocationAlert=JSON.parse(actionPayload);
+                        const location=this.app.locations.getLocation(at.Id);
+                        if(location){
+                            if(at.Stream){
+                                this.app.history.push(`/location/${at.Id}/stream/${at.Stream.Id}`);
+                                Log.infoUI(`Alert from ${location.Name} - ${at.Stream.Name}`);
+                            }else{
+                                this.app.history.push(`/location/${at.Id}`);
+                                Log.infoUI(`Alert from ${location.Name}`);
+                            }
+                        }
+                    }
                     break;
             }
             save=true;

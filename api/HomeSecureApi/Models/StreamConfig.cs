@@ -8,6 +8,8 @@ namespace HomeSecureApi.Models
 
         public string Uri{get;set;}
 
+        public string Tag{get;set;}
+
 
         public StreamInfo GetInfo()
         {
@@ -15,6 +17,7 @@ namespace HomeSecureApi.Models
             {
                 Id=Id,
                 Name=Name,
+                Tag=Tag
             };
         }
     }

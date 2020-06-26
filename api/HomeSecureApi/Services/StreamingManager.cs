@@ -66,6 +66,12 @@ namespace HomeSecureApi.Services
             return _StreamConfigs;
         }
 
+        public async Task<StreamConfig> GetStreamByTagAsync(string tag, CancellationToken cancel)
+        {
+            var streams=await GetStreamConfigsAsync(cancel);
+            return streams.FirstOrDefault(s=>s.Tag==tag);
+        }
+
         private StreamSession GetSession(int streamId, Guid sessionId, string sessionToken)
         {
             StreamSession session;

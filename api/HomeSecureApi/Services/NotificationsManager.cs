@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -138,6 +139,7 @@ namespace HomeSecureApi.Services
 
         public async Task<List<PushNotificationResult>> SendNotificationAsync(
             string message,
+            [AllowNull]Dictionary<string,string> customKeys,
             CancellationToken cancel)
         {
             var devices=await GetDevicesAsync(cancel);
@@ -147,7 +149,7 @@ namespace HomeSecureApi.Services
 
             foreach(var d in devices){
                 cancel.ThrowIfCancellationRequested();
-                var r=await SendNotificationAsync(d.Id,d.Type,message,cancel);
+                var r=await SendNotificationAsync(d.Id,d.Type,message,customKeys,cancel);
                 results.Add(r);
             }
 
@@ -155,21 +157,11 @@ namespace HomeSecureApi.Services
 
         }
 
-
-        public Task<PushNotificationResult> SendNotificationAsync(
-            string deviceId,
-            NotificationType type,
-            string message,
-            CancellationToken cancel)
-        {
-            return SendNotificationAsync(deviceId,type,message,null,cancel);
-        }
-
         public async Task<PushNotificationResult> SendNotificationAsync(
             string deviceId,
             NotificationType type,
             string message,
-            Dictionary<string,string> customKeys,
+            [AllowNull]Dictionary<string,string> customKeys,
             CancellationToken cancel)
         {
             PushNotificationResultType rt;
@@ -185,14 +177,6 @@ namespace HomeSecureApi.Services
                 Type=rt,
                 DeviceId=deviceId
             };
-        }
-
-        public Task<PushNotificationResultType> SendIosPushNotificationAsync(
-            string deviceId,
-            string message,
-            CancellationToken cancel)
-        {
-            return SendIosPushNotificationAsync(deviceId,message,null,cancel);
         }
 
         public async Task<PushNotificationResultType> SendIosPushNotificationAsync(

@@ -26,7 +26,7 @@ namespace HomeSecureApi.Controllers
         public Task<List<NotificationsManager.PushNotificationResult>> SendTest([FromQuery]string key, [FromQuery]string message, CancellationToken cancel)
         {
             _Config.VerifyUtilAuth(key);
-            return _Mgr.SendNotificationAsync(message,cancel);
+            return _Mgr.SendNotificationAsync(message,null,cancel);
         }
 
         [HttpPost("Device")]
