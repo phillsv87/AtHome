@@ -9,6 +9,7 @@ import { useEmitter } from '../CommonJs/EventEmitterEx-rn';
 import { StateChangeEvent } from '../lib/NativeDevice';
 import Button from './Button';
 import { useScrollable } from '../CommonJs/ScrollContext';
+import Header from './Header';
 
 interface LocationProps
 {
@@ -73,6 +74,7 @@ export default function Location({
 
     return (
         <View>
+            <Header pop title={location.Name} icon="home"/>
             {streams.map((s)=>(
                 <Button title={s.Name} key={s.Id} onPress={()=>history.push(`/location/${location.Id}/stream/${s.Id}`)} />
             ))}

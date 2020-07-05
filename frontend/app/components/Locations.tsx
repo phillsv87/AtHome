@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useApp } from '../lib/hooks';
 import Button from './Button';
+import Header from './Header';
 
 export default function Locations()
 {
@@ -10,6 +11,8 @@ export default function Locations()
 
     return (
         <View style={styles.root}>
+
+            <Header title="Locations" icon="map"/>
 
             {locations.locations.map(loc=>(
                 <Button title={loc.Name} key={loc.Id} onPress={()=>history.push('/location/'+loc.Id)}/>

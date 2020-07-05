@@ -4,10 +4,11 @@ import { useMounted } from '../CommonJs/Hooks';
 import { useApp } from '../lib/hooks';
 import Log from '../CommonJs/Log';
 import Busy from './Busy';
-import { inputStyle, inputLineStyle } from '../lib/style';
+import { inputLineStyle } from '../lib/style';
 import { delayAsync } from '../CommonJs/utilTs';
 import Button from './Button';
 import TextInput from './TextInput';
+import Header from './Header';
 
 interface LocationConfigProps
 {
@@ -78,6 +79,7 @@ export default function LocationConfig({
     return (
         <>
             <View style={[styles.root,{opacity:busy?0.3:1}]}>
+                <Header pop title={location?.Name||(add?'New Location':'...')} icon="cog"/>
                 <TextInput placeholder="Name" value={name} onChangeText={v=>setName(v)} />
                 <TextInput placeholder="Url" value={url} onChangeText={v=>setUrl(v)} />
                 {add&&<TextInput placeholder="Token" value={token} onChangeText={v=>setToken(v)} />}
