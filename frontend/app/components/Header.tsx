@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import RnIcon from '../CommonJs/RnIcon-rn';
 import { primaryColor, primaryOverlayColor } from '../lib/style';
-import { useApp } from '../lib/hooks';
+import BackButton from './BackButton';
 
 interface HeaderProps
 {
@@ -17,15 +17,11 @@ export default function Header({
     pop
 }:HeaderProps){
 
-    const {history}=useApp();
-
     return (
         <View style={styles.root}>
             <RnIcon style={styles.icon} size={130} icon={icon as string}/>
             <Text style={styles.text}>{title}</Text>
-            {pop&&<TouchableOpacity style={styles.pop} onPress={()=>history.pop()}>
-                <RnIcon icon="ft:chevron-left" size={30} color={primaryColor} style={styles.popIcon}/>
-            </TouchableOpacity>}
+            {pop&&<BackButton/>}
         </View>
     )
 
@@ -49,18 +45,5 @@ const styles=StyleSheet.create({
         letterSpacing:5,
         fontSize:18,
     },
-    pop:{
-        position:'absolute',
-        left:20,
-        top:20,
-        backgroundColor:primaryOverlayColor,
-        borderRadius:100,
-        width:40,
-        height:40,
-        alignItems:'center',
-        justifyContent:'center'
-    },
-    popIcon:{
-        transform:[{translateX:-1},{translateY:1}]
-    }
+    
 });
