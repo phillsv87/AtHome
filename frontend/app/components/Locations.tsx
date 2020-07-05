@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, Button } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useApp } from '../lib/hooks';
-import ListItem from './ListItem';
+import Button from './Button';
 
 export default function Locations()
 {
@@ -12,10 +12,10 @@ export default function Locations()
         <View style={styles.root}>
 
             {locations.locations.map(loc=>(
-                <ListItem title={loc.Name} key={loc.Id} onPress={()=>history.push('/location/'+loc.Id)}/>
+                <Button title={loc.Name} key={loc.Id} onPress={()=>history.push('/location/'+loc.Id)}/>
             ))}
 
-            <Button title="Add Location" onPress={()=>history.push('/add-location')}/>
+            <Button primary title="Add Location" onPress={()=>history.push('/add-location')} icon="plus"/>
 
         </View>
     )

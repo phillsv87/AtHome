@@ -1,11 +1,13 @@
 import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, TextInput, Button, Switch, Text } from 'react-native';
+import { View, StyleSheet, Switch, Text } from 'react-native';
 import { useMounted } from '../CommonJs/Hooks';
 import { useApp } from '../lib/hooks';
 import Log from '../CommonJs/Log';
 import Busy from './Busy';
 import { inputStyle, inputLineStyle } from '../lib/style';
 import { delayAsync } from '../CommonJs/utilTs';
+import Button from './Button';
+import TextInput from './TextInput';
 
 interface LocationConfigProps
 {
@@ -76,16 +78,16 @@ export default function LocationConfig({
     return (
         <>
             <View style={[styles.root,{opacity:busy?0.3:1}]}>
-                <TextInput style={inputStyle} placeholderTextColor="#bbb" placeholder="Name" value={name} onChangeText={v=>setName(v)} />
-                <TextInput style={inputStyle} placeholderTextColor="#bbb" placeholder="Url" value={url} onChangeText={v=>setUrl(v)} />
-                {add&&<TextInput style={inputStyle} placeholderTextColor="#bbb" placeholder="Token" value={token} onChangeText={v=>setToken(v)} />}
+                <TextInput placeholder="Name" value={name} onChangeText={v=>setName(v)} />
+                <TextInput placeholder="Url" value={url} onChangeText={v=>setUrl(v)} />
+                {add&&<TextInput placeholder="Token" value={token} onChangeText={v=>setToken(v)} />}
                 <View style={inputLineStyle}>
                     <Text>Receive Notifications</Text>
                     <Switch value={notifications} onValueChange={setNotifications} />
                 </View>
 
 
-                <Button title={add?'Add':'Save'} onPress={submit} />
+                <Button primary icon="plus" title={add?'Add':'Save'} onPress={submit} />
 
                 {!add&&<>
                     {!confirmDelete&&<Button title="Delete" onPress={()=>setConfirmDelete(true)} />}

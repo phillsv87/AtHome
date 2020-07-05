@@ -3,11 +3,12 @@ import { useApp } from '../lib/hooks';
 import { useAsync } from '../CommonJs/AsyncHooks';
 import Log from '../CommonJs/Log';
 import { StreamInfo } from '../lib/types';
-import { View, Button } from 'react-native';
+import { View } from 'react-native';
 import Busy from './Busy';
-import ListItem from './ListItem';
 import { useEmitter } from '../CommonJs/EventEmitterEx-rn';
 import { StateChangeEvent } from '../lib/NativeDevice';
+import Button from './Button';
+import { useScrollable } from '../CommonJs/ScrollContext';
 
 interface LocationProps
 {
@@ -22,6 +23,8 @@ export default function Location({
 
     const {devicePushId}=device.getState();
     useEmitter(device,StateChangeEvent);
+
+    useScrollable();
 
     const location=locations.getLocation(locationId);
 
@@ -71,9 +74,9 @@ export default function Location({
     return (
         <View>
             {streams.map((s)=>(
-                <ListItem title={s.Name} key={s.Id} onPress={()=>history.push(`/location/${location.Id}/stream/${s.Id}`)} />
+                <Button title={s.Name} key={s.Id} onPress={()=>history.push(`/location/${location.Id}/stream/${s.Id}`)} />
             ))}
-            <Button title="Config" onPress={()=>history.push(`/location/${location.Id}/config`)}/>
+            <Button icon="cog" primary title="Config" onPress={()=>history.push(`/location/${location.Id}/config`)}/>
         </View>
     )
 
