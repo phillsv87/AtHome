@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useApp } from '../lib/hooks';
 import { useAsync } from '../CommonJs/AsyncHooks';
 import Log from '../CommonJs/Log';
@@ -68,6 +68,8 @@ export default function Location({
 
     },[location,locations,devicePushId,device]);
 
+    const allIds=useMemo(()=>streams?streams.map(s=>s.Id).join(','):'',[streams]);
+
     if(!streams || !location){
         return <Busy/>
     }
@@ -76,8 +78,16 @@ export default function Location({
         <View>
             <Header pop title={location.Name} icon="home"/>
             {streams.map((s)=>(
-                <Button title={s.Name} key={s.Id} onPress={()=>history.push(`/location/${location.Id}/stream/${s.Id}`)} />
+                <Button
+                    title={s.Name}
+                    key={s.Id}
+                    onPress={()=>history.push(`/location/${location.Id}/stream/${s.Id}`)}
+                    icon="ft:chevron-right" />
             ))}
+            {streams.length>1&&<Button
+                title="All"
+                onPress={()=>history.push(`/location/${location.Id}/stream/${allIds}`)}
+                icon="ft:grid"/>}
             <Button icon="cog" primary title="Config" onPress={()=>history.push(`/location/${location.Id}/config`)}/>
         </View>
     )

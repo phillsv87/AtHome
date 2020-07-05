@@ -4,12 +4,20 @@ import Page from './Page';
 import { ViewRoute, ViewMatch, Navigation } from '../CommonJs/Navigation-rn';
 import NavigationAnimation, { NavigationAnimationTypes, shouldUseNativeDriver } from '../CommonJs/NavigationAnimation-rn';
 import { useApp } from '../lib/hooks';
-import Stream from './Stream';
+import StreamsLayout from './StreamsLayout';
 import HsApp from '../lib/HsApp';
 import Location from './Location';
 import Locations from './Locations';
 import { unused } from '../CommonJs/commonUtils';
 import LocationConfig from './LocationConfig';
+
+function toIds(id:string|null):number[]
+{
+    if(!id){
+        return [];
+    }
+    return id.split(',').map(i=>Number(i));
+}
 
 /* eslint react/display-name:0 */
 function getRoutes(app:HsApp):ViewRoute[]{
@@ -26,9 +34,9 @@ function getRoutes(app:HsApp):ViewRoute[]{
             render:()=><LocationConfig add/>
         },
         {
-            match:/^\/location\/([^/]+)\/stream\/(\d+)$/i,
+            match:/^\/location\/([^/]+)\/stream\/([\d,]+)$/i,
             postRender: pageSlim,
-            render:(m)=><Stream locationId={m.param(0)||undefined} streamId={m.paramNumber(1)}/>
+            render:(m)=><StreamsLayout locationId={m.param(0)||undefined} streamIds={toIds(m.param(1))}/>
         },
         {
             match:/^\/location\/([^/]+)\/config$/i,

@@ -15,7 +15,7 @@ export default function Locations()
             <Header title="Locations" icon="map"/>
 
             {locations.locations.map(loc=>(
-                <Button title={loc.Name} key={loc.Id} onPress={()=>history.push('/location/'+loc.Id)}/>
+                <Button title={loc.Name} key={loc.Id} onPress={()=>history.push('/location/'+loc.Id)} icon="ft:chevron-right"/>
             ))}
 
             <Button primary title="Add Location" onPress={()=>history.push('/add-location')} icon="plus"/>

@@ -8,7 +8,6 @@ import Busy from './Busy';
 
 // @ts-ignore
 import Video from 'react-native-video';
-import BackButton from './BackButton';
 
 interface StreamProps
 {
@@ -79,7 +78,6 @@ export default function Stream({
                 :
                 <Busy/>
             }
-            <BackButton iconColor="#000" style={styles.back}/>
         </View>
     )
 
@@ -92,8 +90,5 @@ const styles=StyleSheet.create({
     },
     video:{
        flex:1
-    },
-    back:{
-        top:40
     }
 });
