@@ -6,7 +6,6 @@ import Log from '../CommonJs/Log';
 import { delayAsync } from '../CommonJs/utilTs';
 import Busy from './Busy';
 
-// @ts-ignore
 import Video from 'react-native-video';
 
 interface StreamProps
@@ -73,6 +72,7 @@ export default function Stream({
         <View style={styles.root}>
             {session && location?
                 <Video
+                    playInBackground
                     style={styles.video}
                     source={{uri:location.ApiBaseUrl+session.Uri}}/>
                 :
